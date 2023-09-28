@@ -79,6 +79,9 @@ class MyWebServer(socketserver.BaseRequestHandler):
         if path == '':
             return b'HTTP/1.1 404 Not Found \r\n'
         
+        if '..' in path:
+            path = path.split('..')[-1]
+        
         main_path = 'www' + path
         if os.path.exists('www' + path):
             if os.path.isfile('www' + path) == False:
@@ -92,24 +95,13 @@ class MyWebServer(socketserver.BaseRequestHandler):
                     current_datetime = datetime.datetime.utcnow()
                     formatted_date = current_datetime.strftime('%a, %d %b %Y %H:%M:%S GMT')
                     return b'HTTP/1.1 301 Moved Permanently \r\n' + b'Location: ' + path.encode('utf-8') + b'/\r\n' + b'Date: ' + formatted_date.encode('utf-8') + b' \r\n'
-                
-            if path.endswith('.css'):
-                with open(main_path, 'rb') as fh:
-                    file_data = fh.read()
-
-                length_file_data = str(len(file_data)).encode('utf-8')
-
-                current_datetime = datetime.datetime.utcnow()
-                formatted_date = current_datetime.strftime('%a, %d %b %Y %H:%M:%S GMT')
-
-                # Set the Content-Type header to 'text/css'
-                return b'HTTP/1.1 200 OK\r\n' + \
-                        b'Date: ' + formatted_date.encode('utf-8') + b'\r\n' + \
-                        b'Content-Type: text/css\r\n' + \
-                        b'Content-Length: ' + length_file_data + b'\r\n\r\n' + file_data
-
+        
             with open(main_path, 'rb') as fh:
-                file_data = fh.read()
+                file_data = fh.read().decode('utf-8')
+                file_data = file_data.encode()
+                # print(file_data)
+
+            # print(file_data)
 
             length_file_data = (str(len(file_data))).encode('utf-8')
 
@@ -124,7 +116,10 @@ class MyWebServer(socketserver.BaseRequestHandler):
             else: 
                 main_file_format = b'Content-type: ' + file_format.encode('utf-8') + b' \r\n'
 
-            return b'HTTP/1.1 200 OK \r\n' + b'Date: ' + formatted_date.encode('utf-8') + b' \r\n' + main_file_format + b'Content-length: ' + length_file_data + b' \r\n' + file_data + b' \r\n'
+            response_header = b'HTTP/1.1 200 OK \r\n' + b'Date: ' + formatted_date.encode('utf-8') + b' \r\n' + main_file_format + b'Content-length: ' + length_file_data + b'\r\n\r\n' + file_data
+            print(response_header)
+            return response_header
+            # return b'HTTP/1.1 200 OK \r\n' + b'Date: ' + formatted_date.encode('utf-8') + b' \r\n' + main_file_format + b'Content-length: ' + length_file_data + b' \r\n' + file_data
 
         else:
             return b'HTTP/1.1 404 Not Found \r\n'
