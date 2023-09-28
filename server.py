@@ -45,12 +45,12 @@ class MyWebServer(socketserver.BaseRequestHandler):
         # print(method)
         # print(path)
         # print(not_needed)
+
         # checks if there are errors 
         final_response = self.test_if_valid(request_info)
 
         # if there are no errors execute then execute line in if condition
         if final_response == b'':
-            print('worked')
             final_response = self.valid_response(request_info)
         
         # send the response to the client
@@ -84,9 +84,9 @@ class MyWebServer(socketserver.BaseRequestHandler):
                     current_datetime = datetime.datetime.utcnow()
                     formatted_date = current_datetime.strftime('%a, %d %b %Y %H:%M:%S GMT')
                     return b'HTTP/1.1 301 Moved Permanently \r\n' + b'Location: ' + path.encode('utf-8') + b'/\r\n' + b'Date: ' + formatted_date.encode('utf-8') + b' \r\n'
-
+            
             with open(main_path, 'rb') as fh:
-                file_data = fh.read().encode('utf-8')
+                file_data = fh.read()
 
             length_file_data = (str(len(file_data))).encode('utf-8')
 
