@@ -94,15 +94,14 @@ class MyWebServer(socketserver.BaseRequestHandler):
             formatted_date = current_datetime.strftime('%a, %d %b %Y %H:%M:%S GMT')
 
             file_format = main_path.split('.')[-1]
-            main_file_format = b''
             if file_format == 'html':
-                main_file_format = b'Content type: text/html \r\n'
+                main_file_format = b'Content-type: text/html \r\n'
             elif file_format == 'css':
-                main_file_format = b'Content type: text/css \r\n'
+                main_file_format = b'Content-type: text/css \r\n'
             else: 
-                main_file_format = b'Content type: ' + file_format.encode('utf-8') + b' \r\n'
+                main_file_format = b'Content-type: ' + file_format.encode('utf-8') + b' \r\n'
 
-            return b'HTTP/1.1 200 OK \r\n' + b'Date: ' + formatted_date.encode('utf-8') + b' \r\n' + main_file_format + b'Content-length: ' + length_file_data + b' \r\n' + file_data
+            return b'HTTP/1.1 200 OK \r\n' + b'Date: ' + formatted_date.encode('utf-8') + b' \r\n' + main_file_format + b'Content-length: ' + length_file_data + b' \r\n' + file_data + b' \r\n'
 
         else:
             return b'HTTP/1.1 404 Not Found \r\n'
