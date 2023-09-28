@@ -39,20 +39,26 @@ class MyWebServer(socketserver.BaseRequestHandler):
         print(f"Got a request of: {self.data}\n")
         
         received_request = self.data.decode(format)
-        request_info = received_request.splitlines()[0]
-        # print statements commented out below used for self testing 
-        # print(request_info)
-        # print(method)
-        # print(path)
-        # print(not_needed)
 
-        # checks if there are errors 
-        final_response = self.test_if_valid(request_info)
+        if received_request != '':
+            request_info = received_request.splitlines()[0]
+            method, path, http_version = request_info.split(" ")
+            # print statements commented out below used for self testing 
+            # print(request_info)
+            # print(method)
+            # print(path)
+            # print(not_needed)
 
-        # if there are no errors execute then execute line in if condition
-        if final_response == b'':
-            final_response = self.valid_response(request_info)
+            # checks if there are errors 
+            final_response = self.test_if_valid(request_info)
+
+            # if there are no errors execute then execute line in if condition
+            if final_response == b'':
+                final_response = self.valid_response(path)
         
+        if received_request == '':
+            final_response = self.valid_response('')
+
         # send the response to the client
         self.request.sendall(final_response)
 
@@ -69,8 +75,10 @@ class MyWebServer(socketserver.BaseRequestHandler):
         if os.path.exists('www' + path):
             return b''
     
-    def valid_response(self, request_info):
-        method, path, http_version = request_info.split(" ")
+    def valid_response(self, path):
+        if path == '':
+            return b'HTTP/1.1 404 Not Found \r\n'
+        
         main_path = 'www' + path
         if os.path.exists('www' + path):
             if os.path.isfile('www' + path) == False:
@@ -84,7 +92,22 @@ class MyWebServer(socketserver.BaseRequestHandler):
                     current_datetime = datetime.datetime.utcnow()
                     formatted_date = current_datetime.strftime('%a, %d %b %Y %H:%M:%S GMT')
                     return b'HTTP/1.1 301 Moved Permanently \r\n' + b'Location: ' + path.encode('utf-8') + b'/\r\n' + b'Date: ' + formatted_date.encode('utf-8') + b' \r\n'
-            
+                
+            if path.endswith('.css'):
+                with open(main_path, 'rb') as fh:
+                    file_data = fh.read()
+
+                length_file_data = str(len(file_data)).encode('utf-8')
+
+                current_datetime = datetime.datetime.utcnow()
+                formatted_date = current_datetime.strftime('%a, %d %b %Y %H:%M:%S GMT')
+
+                # Set the Content-Type header to 'text/css'
+                return b'HTTP/1.1 200 OK\r\n' + \
+                        b'Date: ' + formatted_date.encode('utf-8') + b'\r\n' + \
+                        b'Content-Type: text/css\r\n' + \
+                        b'Content-Length: ' + length_file_data + b'\r\n\r\n' + file_data
+
             with open(main_path, 'rb') as fh:
                 file_data = fh.read()
 
