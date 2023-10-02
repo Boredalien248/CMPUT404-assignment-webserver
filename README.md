@@ -24,3 +24,13 @@ examples thus some of the code is Copyright © 2001-2013 Python
 Software Foundation; All Rights Reserved under the PSF license (GPL
 compatible) http://docs.python.org/2/library/socketserver.html
 
+New Contributor / Licensing
+========================
+
+Now LICENSE'D under the Apache 2 license by Kaustubh Mukherjee.
+
+Made by myself without the contribution of others. 
+
+server.py was built by referencing the resources mentioned below: 
+https://stackoverflow.com/questions/8933237/how-do-i-check-if-a-directory-exists-in-python
+https://docs.python.org/3/library/datetime.html
